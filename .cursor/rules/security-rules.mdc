@@ -1,0 +1,37 @@
+# Cursor Security Harness Rules
+
+## Rule: No Hardcoded Secrets
+**Pattern**: `(password|secret|api_key|token|private_key)\s*=\s*['"][^'"]{4,}['"]`  
+**Action**: Block generation and suggest environment variable or secret manager.
+
+## Rule: No SQL String Concatenation
+**Pattern**: `(\+|\$\(|\.format\().*(SELECT|INSERT|UPDATE|DELETE).*`  
+**Action**: Block. Enforce parameterized queries.
+
+## Rule: No eval() or similar
+**Pattern**: `\beval\s*\(|new Function\(|exec\(|system\(`  
+**Action**: Block unless inside a security-reviewed allowlist.
+
+## Rule: No ECB mode or weak hashes
+**Pattern**: `"ECB"|"MD5"|\bmd5\(|\bSHA1\(` (unless used for non‑crypto, e.g., checksum)  
+**Action**: Warn and require explicit justification.
+
+## Rule: Disable insecure TLS versions
+**Pattern**: `TLSv1\.0|TLSv1\.1`  
+**Action**: Block. Require TLSv1.2 or higher.
+
+## Rule: Prevent open redirect
+**Pattern**: `redirect\(.*user.*input|window\.location\s*=.*param`  
+**Action**: Block unless validated against allowlist.
+
+## Rule: Log injection
+**Pattern**: `log\(".*\+\s*(user|input|data)`  
+**Action**: Warn. Logs must encode newline and special characters.
+
+## Rule: No `chmod 777` or equivalent
+**Pattern**: `chmod\s+777|0o777`  
+**Action**: Block.
+
+## Rule: Validate all input at trusted layer
+**Pattern**: `req\.body\.|request\.GET\.|params\[` — must be followed by validation function call.  
+**Action**: Warn if validation missing.

@@ -1,0 +1,50 @@
+# SSG configuration for AI agent governance
+version: "1.0"
+
+rulesets:
+  - bash:
+      - id: "BLOCK_REVERSE_SHELL"
+        pattern: "bash -i >& /dev/tcp/|nc -e /bin/sh|sh -i >& /dev/tcp/"
+        action: deny
+        message: "Reverse shell blocked (OWASP ASVS 1.2.5)"
+      - id: "BLOCK_ENCODED_PAYLOAD"
+        pattern: "base64 -d.*\\|.*sh"
+        action: deny
+      - id: "ALLOW_GIT_STATUS"
+        pattern: "^git status$"
+        action: allow
+
+  - sql:
+      - id: "NO_CONCATENATION"
+        pattern: "(\\+|\\$\\{|format\\()\\.*(SELECT|INSERT|UPDATE)"
+        action: deny
+        message: "Use parameterized queries (ASVS 1.2.4)"
+
+  - secrets:
+      - id: "HARDCODED_SECRET"
+        pattern: "(password|secret|api_key|token)\\s*=\\s*['\"][^'\"]+['\"]"
+        action: deny
+
+  - crypto:
+      - id: "WEAK_ALGO"
+        pattern: "\\b(MD5|SHA1|RC4|DES)\\b"
+        action: warn
+        message: "Deprecated algorithm (ASVS Appendix C)"
+
+  - file_access:
+      - id: "BLOCK_ENV_FILE"
+        pattern: "cat\\s+\\.env|cat\\s+/etc/passwd"
+        action: deny
+
+token_budget:
+  per_session: 10000   # limit token usage per session
+  per_day: 50000
+
+logging:
+  output: stdout
+  format: json
+  include_audit_chain: true
+
+approval_dashboard:
+  enabled: true
+  port: 8080

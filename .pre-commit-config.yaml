@@ -1,0 +1,32 @@
+repos:
+  - repo: https://github.com/owasp/semgrep-rules
+    rev: v1.0.0
+    hooks:
+      - id: semgrep
+        args: ["--config", "p/owasp-top-ten", "--severity", "ERROR"]
+
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.4.0
+    hooks:
+      - id: detect-secrets
+        args: ["--baseline", ".secrets.baseline"]
+
+  - repo: https://github.com/pyupio/safety
+    rev: 3.2.0
+    hooks:
+      - id: safety
+        args: ["check", "--json", "--output", "safety-report.json"]
+
+  - repo: https://github.com/anchore/grype
+    rev: v0.70.0
+    hooks:
+      - id: grype
+        args: ["dir:.", "--fail-on", "critical"]
+
+  - repo: local
+    hooks:
+      - id: asvs-rule-check
+        name: OWASP ASVS custom rules
+        entry: bash .ai-security-harness/check-asvs.sh
+        language: script
+        files: \.(py|js|java|go|rs|ts)$

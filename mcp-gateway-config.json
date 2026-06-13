@@ -1,0 +1,39 @@
+{
+  "gateway": {
+    "mode": "proxy",
+    "listen": "127.0.0.1:9090",
+    "upstream_agents": ["claude", "cursor", "codex"],
+    "taint_tracking": true,
+    "sandbox": {
+      "enable": true,
+      "allowed_syscalls": ["read", "write", "open", "close", "stat"],
+      "block_network": false,
+      "allow_localhost": true
+    },
+    "policies": [
+      {
+        "name": "No SQL injection",
+        "detect": "sql_concat",
+        "action": "block"
+      },
+      {
+        "name": "No eval",
+        "detect": "unsafe_eval",
+        "action": "block"
+      },
+      {
+        "name": "MFA required",
+        "detect": "authentication_without_mfa",
+        "action": "log_and_warn"
+      }
+    ],
+    "audit": {
+      "sigstore": true,
+      "log_file": "/var/log/mcp-gateway/audit.log"
+    },
+    "token_limits": {
+      "max_per_request": 4096,
+      "max_per_session": 10000
+    }
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "permissions": {
+    "deny": [
+      "rm -rf",
+      "git push --force",
+      "git reset --hard",
+      "DROP DATABASE",
+      "DROP TABLE",
+      "dd if=/dev/zero",
+      "mkfs",
+      "chmod 777",
+      "chmod 0777",
+      "curl.*\\|.*sh",
+      "wget.*\\|.*bash",
+      "bash -i >& /dev/tcp/",
+      "nc -e /bin/sh",
+      "python -c 'import socket,subprocess,os;",
+      "eval\\(",
+      "exec\\("
+    ],
+    "allow": [
+      "git status",
+      "git diff",
+      "git log",
+      "npm test",
+      "pytest",
+      "go test",
+      "cargo test",
+      "make test"
+    ]
+  },
+  "sensitiveFiles": {
+    "denyRead": [
+      ".env",
+      ".aws/credentials",
+      ".ssh/id_rsa",
+      "*.pem",
+      "*.key",
+      "secrets.yml",
+      "config/secrets/*"
+    ]
+  }
+}
